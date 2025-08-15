@@ -25,6 +25,9 @@ const state = {
   letter: "All",
   modalOpen: false,
   lastFocus: null,
+  // Preview configuration
+  previewLimit: 175,
+  previewOverride: false,
 };
 
 init();
@@ -34,6 +37,23 @@ async function init() {
   buildFilterBar();
   bindSearch();
   setupModal();
+  // Determine preview length (URL param > localStorage > viewport default)
+  const cfg = getConfiguredPreviewLimit();
+  state.previewLimit = cfg.limit;
+  state.previewOverride = cfg.override;
+  // If not overridden, adapt on resize
+  if (!state.previewOverride) {
+    window.addEventListener(
+      "resize",
+      debounce(() => {
+        const next = computeViewportLimit();
+        if (next !== state.previewLimit) {
+          state.previewLimit = next;
+          render();
+        }
+      }, 150)
+    );
+  }
   try {
     const mdText = await fetchMarkdown("glossary.md");
     state.entries = parseGlossary(mdText);
@@ -214,6 +234,34 @@ function getPreview(text, limit = 175) {
   return { preview: slice.trim() + "…", truncated: true };
 }
 
+// Compute viewport-aware preview limit
+function computeViewportLimit() {
+  const isSmall = window.matchMedia && window.matchMedia("(max-width: 480px)").matches;
+  return isSmall ? 150 : 175;
+}
+
+// Read preview limit from URL or localStorage; fallback to viewport default
+function getConfiguredPreviewLimit() {
+  try {
+    const url = new URL(window.location.href);
+    const qp = url.searchParams.get("preview");
+    if (qp) {
+      const v = parseInt(qp, 10);
+      if (Number.isFinite(v) && v >= 50 && v <= 500) {
+        return { limit: v, override: true };
+      }
+    }
+  } catch (_) {}
+  const stored = localStorage.getItem("glossary-preview-limit");
+  if (stored) {
+    const v = parseInt(stored, 10);
+    if (Number.isFinite(v) && v >= 50 && v <= 500) {
+      return { limit: v, override: true };
+    }
+  }
+  return { limit: computeViewportLimit(), override: false };
+}
+
 // --- Modal logic ---
 function setupModal() {
   if (!els.modal) return;
@@ -324,7 +372,7 @@ function render() {
 
     const body = document.createElement("div");
     body.className = "body";
-    const { preview, truncated } = getPreview(e.definition, 175);
+    const { preview, truncated } = getPreview(e.definition, state.previewLimit);
     // Use textContent to avoid injecting HTML in preview
     const p = document.createElement("p");
     p.textContent = preview;
