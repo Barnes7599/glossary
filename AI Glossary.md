@@ -88,6 +88,10 @@ Prompting or training a model to spell out its intermediate reasoning steps (e.g
 
 OpenAI’s conversational interface built on the GPT family. It answers questions, writes and edits text or code, and can call tools like web browsers or data APIs. Newer versions handle images, audio, and very long contexts, effectively acting as a general-purpose assistant rather than a simple chatbot.
 
+# Chats
+
+In AI, "chats" refer to the interactions or conversations between a user and a conversational agent (such as a chatbot or virtual assistant). Chats can encompass a variety of formats, including text-based messaging, voice communication, or even visual inputs. The focus is on the exchange of information, where users can ask questions, seek assistance, or engage in dialogue.
+
 # Claude
 
 Anthropic’s large language model/assistant, designed around “helpful, harmless, honest” principles. Claude handles long documents, images, and complex reasoning, and can follow constitutional rules baked into training to keep outputs within desired bounds.
@@ -290,7 +294,7 @@ A neural network with billions (or trillions) of parameters trained on massive t
 
 # Loss Function
 
- The math that scores how wrong a model’s prediction is on training data. Training is just minimizing this loss—tweaking parameters so the score drops—so the choice of loss (cross-entropy, MSE, contrastive) directly shapes what “success” means for the model.
+The math that scores how wrong a model’s prediction is on training data. Training is just minimizing this loss—tweaking parameters so the score drops—so the choice of loss (cross-entropy, MSE, contrastive) directly shapes what “success” means for the model.
 
 # M
 
@@ -320,7 +324,7 @@ The learned function that maps inputs to outputs—its parameters encode everyth
 
 # Model Training
 
- The compute-intensive process of feeding data through a model, computing loss, and updating parameters (via backpropagation/optimizers) until performance plateaus. It involves data curation, hyperparameter tuning, checkpointing, and lots of monitoring to avoid over/underfitting.
+The compute-intensive process of feeding data through a model, computing loss, and updating parameters (via backpropagation/optimizers) until performance plateaus. It involves data curation, hyperparameter tuning, checkpointing, and lots of monitoring to avoid over/underfitting.
 
 # Multimodal AI
 
@@ -418,6 +422,14 @@ Search that uses meaning, not just exact keywords. You embed queries and documen
 
 Automatically classifying the emotional tone of text—positive, negative, neutral, or finer-grained moods. Classic pipelines used lexicons and classifiers; today, LLMs or fine-tuned transformers score sentiment across reviews, tweets, support tickets, and more. Calibration matters: sarcasm, domain slang, and mixed feelings trip up naive models.
 
+# Sessions
+
+A "session" in AI refers to a defined period of interaction between a user and an AI system. It represents the duration from when a user initiates an interaction (e.g., starting a chat) until that interaction concludes (e.g., closing the chat or timing out). Sessions can include multiple chats and are often used to track user activity, preferences, and context over time. Key characteristics include:
+
+- State Management: Sessions often involve maintaining user data and context throughout the interaction.
+- Duration: Sessions can be short (one-time interactions) or long (extended dialogues).
+- Session IDs: Unique identifiers are often generated to track individual sessions for analytics or personalization.
+
 # Speech-to-Text
 
 Converting spoken audio into written words (automatic speech recognition). Modern systems chunk audio, detect phonemes or tokens, and decode with neural language models, handling accents, noise, and code-switching far better than in the 2010s. High-quality ASR underpins voice assistants, call-center analytics, meeting transcription, and accessibility tools.
@@ -466,7 +478,7 @@ Reusing knowledge from one task/domain to accelerate another. Instead of trainin
 
 # Transformer
 
-A transformer is a neural-network architecture built entirely on self-attention (no recurrence) that processes sequences in parallel, first described in the 2017 paper “Attention Is All You Need,” and now underpins most modern language and multimodal AI models.  
+A transformer is a neural-network architecture built entirely on self-attention (no recurrence) that processes sequences in parallel, first described in the 2017 paper “Attention Is All You Need,” and now underpins most modern language and multimodal AI models.
 
 # Turing Test
 
