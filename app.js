@@ -205,10 +205,13 @@ function mdToPlainText(text) {
     .trim();
 }
 
-function getPreview(text, limit = 250) {
+function getPreview(text, limit = 175) {
   const plain = mdToPlainText(text);
   if (plain.length <= limit) return { preview: plain, truncated: false };
-  return { preview: plain.slice(0, limit).trim() + "…", truncated: true };
+  let slice = plain.slice(0, limit);
+  const lastSpace = slice.lastIndexOf(" ");
+  if (lastSpace > 0) slice = slice.slice(0, lastSpace);
+  return { preview: slice.trim() + "…", truncated: true };
 }
 
 // --- Modal logic ---
@@ -321,7 +324,7 @@ function render() {
 
     const body = document.createElement("div");
     body.className = "body";
-    const { preview, truncated } = getPreview(e.definition, 250);
+    const { preview, truncated } = getPreview(e.definition, 175);
     // Use textContent to avoid injecting HTML in preview
     const p = document.createElement("p");
     p.textContent = preview;
@@ -337,6 +340,7 @@ function render() {
       more.type = "button";
       more.className = "more-btn";
       more.textContent = "More";
+      more.setAttribute("aria-label", `Read more about ${e.term}`);
       more.addEventListener("click", () => openModal(e, more));
       card.appendChild(more);
     }
