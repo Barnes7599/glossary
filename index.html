@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Interactive AI Glossary</title>
+  <meta name="description" content="Searchable, filterable AI glossary built from a Markdown file." />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <span class="logo">🤖</span>
+      <h1>AI Glossary</h1>
+    </div>
+
+    <div class="controls">
+      <div class="search">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zM10 14a4 4 0 1 1 .001-8.001A4 4 0 0 1 10 14"/></svg>
+        <input id="searchInput" type="search" placeholder="Search terms and definitions..." autocomplete="off" />
+      </div>
+      <button id="themeToggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1m0 14a4 4 0 1 0 0-8a4 4 0 0 0 0 8m7-5h2a1 1 0 1 1 0 2h-2a1 1 0 1 1 0-2M3 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1m15.66-6.66a1 1 0 0 1 1.41 0l1.41 1.41a1 1 0 0 1-1.41 1.41l-1.41-1.41a1 1 0 0 1 0-1.41M4.51 18.02a1 1 0 0 1 1.41 0l1.41 1.41a1 1 0 0 1-1.41 1.41l-1.41-1.41a1 1 0 0 1 0-1.41m14.33 1.41a1 1 0 0 1-1.41 1.41l-1.41-1.41a1 1 0 1 1 1.41-1.41zM6.34 4.93a1 1 0 0 1 0 1.41L4.93 7.75A1 1 0 0 1 3.52 6.34l1.41-1.41a1 1 0 0 1 1.41 0"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <nav id="filters" class="filters" aria-label="Alphabet filters">
+    <!-- Buttons injected by JS -->
+  </nav>
+
+  <main class="content">
+    <section id="stats" class="stats" aria-live="polite"></section>
+    <section id="cards" class="cards" aria-label="Glossary entries">
+      <!-- Cards injected by JS -->
+    </section>
+    <section id="status" class="status" hidden></section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Built from <code>AI Glossary.md</code></span>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
