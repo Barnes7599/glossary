@@ -225,9 +225,13 @@ button {
 
 /* Card actions */
 .more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   align-self: flex-start;
   margin-top: 6px;
-  padding: 8px 10px;
+  min-height: 44px; /* better touch target */
+  padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: color-mix(in oklab, var(--card), transparent 6%);
@@ -235,6 +239,10 @@ button {
   cursor: pointer;
 }
 .more-btn:hover { transform: translateY(-1px); }
+.more-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 .status {
   margin-top: 18px;

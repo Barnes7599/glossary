@@ -28,6 +28,8 @@ const state = {
   // Preview configuration
   previewLimit: 175,
   previewOverride: false,
+  // Deep-linking state
+  currentSlug: null,
 };
 
 init();
@@ -59,6 +61,9 @@ async function init() {
     state.entries = parseGlossary(mdText);
     state.filtered = state.entries.slice();
     render();
+    // Handle deep-links on load and respond to hash changes
+    maybeOpenFromHash();
+    window.addEventListener("hashchange", maybeOpenFromHash);
   } catch (err) {
     showStatus(`Failed to load glossary.md: ${err?.message || err}`);
   }
@@ -310,6 +315,13 @@ function openModal(entry, triggerEl) {
   els.modal.hidden = false;
   document.body.classList.add("no-scroll");
   state.modalOpen = true;
+  // Update hash for deep-linking
+  const slug = slugifyTerm(entry.term);
+  state.currentSlug = slug;
+  const targetHash = `#term-${slug}`;
+  if ((location.hash || "") .toLowerCase() !== targetHash) {
+    try { history.pushState(null, "", targetHash); } catch (_) { location.hash = targetHash; }
+  }
   // Move focus to dialog
   requestAnimationFrame(() => {
     els.modalDialog?.focus();
@@ -326,6 +338,19 @@ function closeModal() {
     state.lastFocus.focus();
   }
   state.lastFocus = null;
+  // Clear hash if it matches our current entry
+  if (state.currentSlug) {
+    const currentTarget = `#term-${state.currentSlug}`;
+    if ((location.hash || "").toLowerCase() === currentTarget) {
+      try {
+        history.replaceState(null, "", window.location.pathname + window.location.search);
+      } catch (_) {
+        // Fallback: set to empty hash
+        location.hash = "";
+      }
+    }
+  }
+  state.currentSlug = null;
 }
 
 function applyFilters() {
@@ -387,9 +412,25 @@ function render() {
       const more = document.createElement("button");
       more.type = "button";
       more.className = "more-btn";
-      more.textContent = "More";
-      more.setAttribute("aria-label", `Read more about ${e.term}`);
-      more.setAttribute("title", `Read more about ${e.term}`);
+      more.textContent = "Expand";
+      more.setAttribute("aria-label", `Expand definition for ${e.term}`);
+      more.setAttribute("title", `Expand definition for ${e.term}`);
+      more.setAttribute("aria-haspopup", "dialog");
+      more.setAttribute("aria-controls", "modal");
+      more.dataset.term = e.term;
+      // Add chevron icon
+      const svgNS = "http://www.w3.org/2000/svg";
+      const icon = document.createElementNS(svgNS, "svg");
+      icon.setAttribute("aria-hidden", "true");
+      icon.setAttribute("width", "14");
+      icon.setAttribute("height", "14");
+      icon.setAttribute("viewBox", "0 0 24 24");
+      const path = document.createElementNS(svgNS, "path");
+      path.setAttribute("fill", "currentColor");
+      // Down chevron
+      path.setAttribute("d", "M6 9l6 6 6-6");
+      icon.appendChild(path);
+      more.appendChild(icon);
       more.addEventListener("click", () => openModal(e, more));
       card.appendChild(more);
     }
@@ -425,4 +466,33 @@ function debounce(fn, wait = 150) {
     clearTimeout(t);
     t = setTimeout(() => fn.apply(null, args), wait);
   };
+}
+
+// --- Deep-link helpers ---
+function slugifyTerm(str) {
+  return String(str)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function findEntryBySlug(slug) {
+  return state.entries.find((e) => slugifyTerm(e.term) === slug) || null;
+}
+
+function maybeOpenFromHash() {
+  const h = (location.hash || "").toLowerCase();
+  const m = h.match(/^#term-(.+)$/);
+  if (m && m[1]) {
+    const slug = m[1];
+    if (state.modalOpen && state.currentSlug === slug) return; // already open
+    const entry = findEntryBySlug(slug);
+    if (entry) {
+      openModal(entry);
+    }
+    return;
+  }
+  // No valid hash -> close if open
+  if (state.modalOpen) closeModal();
 }
