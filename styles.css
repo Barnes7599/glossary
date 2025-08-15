@@ -39,10 +39,7 @@
 * {
   box-sizing: border-box;
 }
-html,
-body {
-  height: 100%;
-}
+html, body { height: 100%; overflow-x: hidden; }
 body {
   margin: 0;
   font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
@@ -117,11 +114,11 @@ button {
   border: 1px solid var(--border);
   padding: 10px 12px;
   border-radius: 14px;
-  min-width: min(440px, 72vw);
   box-shadow: var(--shadow);
 }
 .search input {
   flex: 1;
+  min-width: 0; /* allow shrinking in narrow grids/flex */
   border: none;
   outline: none;
   background: transparent;
@@ -255,4 +252,34 @@ button {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* --- Responsive: stack header on mobile --- */
+@media (max-width: 768px) {
+  .app-header {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px min(16px, 4vw);
+  }
+  .app-header .brand {
+    justify-content: space-between;
+    width: 100%;
+  }
+  .app-header .controls {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto; /* robust shrinking */
+    gap: 8px;
+  }
+  .app-header .search {
+    min-width: 0 !important; /* allow shrinking on small viewports */
+    width: 100% !important;
+  }
+  .app-header .icon-btn {
+    justify-self: end;
+  }
+  .cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
