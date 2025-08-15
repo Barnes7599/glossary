@@ -10,6 +10,12 @@ const els = {
   stats: document.getElementById("stats"),
   status: document.getElementById("status"),
   themeToggle: document.getElementById("themeToggle"),
+  modal: document.getElementById("modal"),
+  modalDialog: document.querySelector("#modal .modal-dialog"),
+  modalOverlay: document.querySelector("#modal .modal-overlay"),
+  modalClose: document.getElementById("modalClose"),
+  modalTitle: document.getElementById("modalTitle"),
+  modalBody: document.getElementById("modalBody"),
 };
 
 const state = {
@@ -17,6 +23,8 @@ const state = {
   filtered: [],
   search: "",
   letter: "All",
+  modalOpen: false,
+  lastFocus: null,
 };
 
 init();
@@ -25,6 +33,7 @@ async function init() {
   setupTheme();
   buildFilterBar();
   bindSearch();
+  setupModal();
   try {
     const mdText = await fetchMarkdown("glossary.md");
     state.entries = parseGlossary(mdText);
@@ -184,6 +193,90 @@ function mdToMinimalHTML(text) {
   return parts.map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`).join("");
 }
 
+// --- Preview helpers ---
+function mdToPlainText(text) {
+  // Remove inline markdown markers, collapse whitespace to plain text
+  return text
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/\r?\n/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getPreview(text, limit = 250) {
+  const plain = mdToPlainText(text);
+  if (plain.length <= limit) return { preview: plain, truncated: false };
+  return { preview: plain.slice(0, limit).trim() + "…", truncated: true };
+}
+
+// --- Modal logic ---
+function setupModal() {
+  if (!els.modal) return;
+  els.modalOverlay?.addEventListener("click", (e) => {
+    if (e.target?.dataset?.close) closeModal();
+  });
+  els.modalClose?.addEventListener("click", () => closeModal());
+
+  // Global key handling for ESC and focus trap when open
+  document.addEventListener("keydown", (e) => {
+    if (!state.modalOpen) return;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeModal();
+      return;
+    }
+    if (e.key === "Tab") {
+      // Simple focus trap
+      const focusables = els.modalDialog.querySelectorAll(
+        'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
+      );
+      const list = Array.from(focusables).filter((el) => !el.hasAttribute("disabled"));
+      if (list.length === 0) {
+        e.preventDefault();
+        els.modalDialog.focus();
+        return;
+      }
+      const first = list[0];
+      const last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
+}
+
+function openModal(entry, triggerEl) {
+  if (!els.modal) return;
+  state.lastFocus = triggerEl || document.activeElement;
+  els.modalTitle.textContent = entry.term;
+  els.modalBody.innerHTML = mdToMinimalHTML(entry.definition);
+  els.modal.hidden = false;
+  document.body.classList.add("no-scroll");
+  state.modalOpen = true;
+  // Move focus to dialog
+  requestAnimationFrame(() => {
+    els.modalDialog?.focus();
+  });
+}
+
+function closeModal() {
+  if (!els.modal) return;
+  els.modal.hidden = true;
+  document.body.classList.remove("no-scroll");
+  state.modalOpen = false;
+  // Restore focus
+  if (state.lastFocus && typeof state.lastFocus.focus === "function") {
+    state.lastFocus.focus();
+  }
+  state.lastFocus = null;
+}
+
 function applyFilters() {
   const q = state.search.toLowerCase();
   const byLetter = state.letter;
@@ -228,11 +321,25 @@ function render() {
 
     const body = document.createElement("div");
     body.className = "body";
-    body.innerHTML = mdToMinimalHTML(e.definition);
+    const { preview, truncated } = getPreview(e.definition, 250);
+    // Use textContent to avoid injecting HTML in preview
+    const p = document.createElement("p");
+    p.textContent = preview;
+    body.innerHTML = "";
+    body.appendChild(p);
 
     card.appendChild(h3);
     card.appendChild(meta);
     card.appendChild(body);
+
+    if (truncated) {
+      const more = document.createElement("button");
+      more.type = "button";
+      more.className = "more-btn";
+      more.textContent = "More";
+      more.addEventListener("click", () => openModal(e, more));
+      card.appendChild(more);
+    }
     frag.appendChild(card);
   }
   els.cards.appendChild(frag);
