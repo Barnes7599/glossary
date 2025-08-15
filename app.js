@@ -389,6 +389,7 @@ function render() {
       more.className = "more-btn";
       more.textContent = "More";
       more.setAttribute("aria-label", `Read more about ${e.term}`);
+      more.setAttribute("title", `Read more about ${e.term}`);
       more.addEventListener("click", () => openModal(e, more));
       card.appendChild(more);
     }
