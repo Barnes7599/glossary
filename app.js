@@ -37,13 +37,28 @@ async function init() {
 
 function setupTheme() {
   const saved = localStorage.getItem('glossary-theme');
-  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  let initial = saved;
+  if (!initial) {
+    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    initial = prefersLight ? 'light' : 'dark';
+  }
+  document.documentElement.setAttribute('data-theme', initial);
+  updateThemeToggleLabel(initial);
+
   els.themeToggle?.addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme') || '';
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
     const next = current === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('glossary-theme', next);
+    updateThemeToggleLabel(next);
   });
+}
+
+function updateThemeToggleLabel(theme) {
+  if (!els.themeToggle) return;
+  const next = theme === 'light' ? 'dark' : 'light';
+  els.themeToggle.title = `Switch to ${next} mode`;
+  els.themeToggle.setAttribute('aria-label', `Switch to ${next} mode`);
 }
 
 function buildFilterBar() {

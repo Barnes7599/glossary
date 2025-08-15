@@ -1,4 +1,5 @@
-/* --- CSS Variables & Theme --- */
+/* --- CSS Variables & Theme (attribute-based) --- */
+/* Default to dark if JS hasn't set a theme yet */
 :root {
   --bg: #0b0c10;
   --card: #12151a;
@@ -10,7 +11,20 @@
   --shadow: 0 8px 24px rgba(0,0,0,.3);
 }
 
-:root[data-theme="light"] {
+/* Explicit dark mode */
+[data-theme="dark"] {
+  --bg: #0b0c10;
+  --card: #12151a;
+  --text: #e6e8eb;
+  --muted: #9aa3ad;
+  --accent: #7c5cff;
+  --accent-2: #27c6a2;
+  --border: #1f2430;
+  --shadow: 0 8px 24px rgba(0,0,0,.3);
+}
+
+/* Explicit light mode */
+[data-theme="light"] {
   --bg: #f7f8fa;
   --card: #ffffff;
   --text: #0f172a;
@@ -19,19 +33,6 @@
   --accent-2: #00b894;
   --border: #e6e8ef;
   --shadow: 0 6px 20px rgba(0,0,0,.08);
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f7f8fa;
-    --card: #ffffff;
-    --text: #0f172a;
-    --muted: #5b6470;
-    --accent: #5b6cff;
-    --accent-2: #00b894;
-    --border: #e6e8ef;
-    --shadow: 0 6px 20px rgba(0,0,0,.08);
-  }
 }
 
 /* --- Base --- */
@@ -93,6 +94,11 @@ button { font: inherit; }
   cursor: pointer;
 }
 .icon-btn:hover { transform: translateY(-1px); }
+
+/* Theme icons: hidden by default, conditional via [data-theme] */
+.theme-icon { display: none; }
+[data-theme="light"] .theme-icon.sun { display: inline-block; }
+[data-theme="dark"] .theme-icon.moon { display: inline-block; }
 
 /* --- Filters --- */
 .filters {
