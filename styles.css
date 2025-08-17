@@ -1,5 +1,8 @@
-/* --- CSS Variables & Theme (attribute-based) --- */
-/* Default to dark if JS hasn't set a theme yet */
+/* --- CSS Variables & Theme --- */
+/* Defines color schemes for light and dark modes using CSS custom properties. */
+/* The theme is controlled by the `data-theme` attribute on the `html` element. */
+
+/* Default theme (dark), also used if `data-theme` is not set. */
 :root {
   --bg: #0b0c10;
   --card: #28223c;
@@ -11,7 +14,7 @@
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
-/* Explicit dark mode */
+/* Dark mode theme variables */
 [data-theme="dark"] {
   --bg: #0b0c10;
   --card: #262935;
@@ -23,7 +26,7 @@
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
-/* Explicit light mode */
+/* Light mode theme variables */
 [data-theme="light"] {
   --bg: #f7f8fa;
   --card: #ffffff;
@@ -35,7 +38,8 @@
   --shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* --- Base --- */
+/* --- Base Styles --- */
+/* Basic resets and global styles. */
 * {
   box-sizing: border-box;
 }
@@ -45,6 +49,7 @@ body {
   font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
   color: var(--text);
+  /* Fancy gradient background */
   background: radial-gradient(
       1200px 800px at 20% -10%,
       rgba(124, 92, 255, 0.15),
@@ -59,14 +64,12 @@ body {
   line-height: 1.55;
 }
 
-h1,
-h2,
-h3 {
+h1, h2, h3 {
   margin: 0;
   line-height: 1.2;
 }
 button {
-  font: inherit;
+  font: inherit; /* Ensures buttons use the body font */
 }
 
 .container {
@@ -75,11 +78,12 @@ button {
 }
 
 /* --- Header --- */
+/* Styles for the sticky header containing branding and controls. */
 .app-header {
   position: sticky;
   top: 0;
   z-index: 50;
-  backdrop-filter: saturate(180%) blur(10px);
+  backdrop-filter: saturate(180%) blur(10px); /* Frosted glass effect */
   background: color-mix(in oklab, var(--bg), transparent 25%);
   border-bottom: 1px solid var(--border);
   padding: 14px min(24px, 4vw);
@@ -101,6 +105,7 @@ button {
   letter-spacing: 0.3px;
 }
 
+/* Controls container (search, select, theme toggle) */
 .controls {
   display: flex;
   align-items: center;
@@ -118,15 +123,15 @@ button {
 }
 .search input {
   flex: 1;
-  min-width: 0; /* allow shrinking in narrow grids/flex */
+  min-width: 0; /* Allow shrinking in flex layouts */
   border: none;
   outline: none;
   background: transparent;
   color: var(--text);
 }
-/* Category select */
+/* Category select dropdown */
 .select select {
-  appearance: none;
+  appearance: none; /* Remove default system appearance */
   -webkit-appearance: none;
   -moz-appearance: none;
   background: var(--card);
@@ -141,6 +146,7 @@ button {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+/* General purpose icon button (used for theme toggle, etc.) */
 .icon-btn {
   display: grid;
   place-items: center;
@@ -158,7 +164,7 @@ button {
   transform: translateY(-1px);
 }
 
-/* Theme icons: hidden by default, conditional via [data-theme] */
+/* Theme icons: hidden by default, shown based on `data-theme` */
 .theme-icon {
   display: none;
 }
@@ -170,6 +176,7 @@ button {
 }
 
 /* --- Filters --- */
+/* Styles for the A-Z filter button bar. */
 .filters {
   display: flex;
   flex-wrap: wrap;
@@ -191,6 +198,7 @@ button {
 }
 
 /* --- Content --- */
+/* Main content area for stats and cards. */
 .content {
   padding: 0 min(24px, 4vw) 60px;
 }
@@ -201,12 +209,14 @@ button {
   font-size: 14px;
 }
 
+/* Grid layout for glossary cards */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 14px;
 }
 
+/* Individual glossary entry card */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -240,14 +250,14 @@ button {
   color: var(--text);
 }
 
-/* Card actions */
+/* "Expand" button on cards */
 .more-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  align-self: flex-start;
+  align-self: flex-start; /* Align to the start of the flex container */
   margin-top: 6px;
-  min-height: 44px; /* better touch target */
+  min-height: 44px; /* Better touch target size */
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
@@ -261,6 +271,7 @@ button {
   outline-offset: 2px;
 }
 
+/* Status message for "No results found" */
 .status {
   margin-top: 18px;
   padding: 12px;
@@ -277,6 +288,7 @@ button {
 }
 
 /* --- Utilities --- */
+/* Helper class to visually hide elements but keep them accessible to screen readers. */
 .hidden {
   display: none !important;
 }
@@ -292,10 +304,11 @@ button {
   border: 0;
 }
 
-/* Prevent body scroll when modal open */
+/* Prevents body scrolling when the modal is open. */
 .no-scroll { overflow: hidden; }
 
 /* --- Modal --- */
+/* Styles for the modal dialog used to show full definitions. */
 .modal[hidden] { display: none !important; }
 .modal {
   position: fixed;
@@ -318,7 +331,7 @@ button {
   box-shadow: var(--shadow);
   padding: 16px;
   outline: none;
-  overflow: auto;
+  overflow: auto; /* Allow scrolling within the modal if content overflows */
 }
 .modal-header {
   display: flex;
@@ -331,8 +344,10 @@ button {
 .modal-header h2 { font-size: 18px; margin: 0; }
 .modal-body { padding-top: 12px; }
 
-/* --- Responsive: stack header on mobile --- */
+/* --- Responsive Styles --- */
+/* Media query for smaller screens (e.g., mobile devices). */
 @media (max-width: 768px) {
+  /* Stack header items vertically */
   .app-header {
     display: grid !important;
     grid-template-columns: 1fr;
@@ -343,19 +358,21 @@ button {
     justify-content: space-between;
     width: 100%;
   }
+  /* Arrange controls in a grid */
   .app-header .controls {
     width: 100%;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto; /* keep search, select, theme in one row */
+    grid-template-columns: minmax(0, 1fr) auto auto; /* Search fills space, others are auto-sized */
     gap: 8px;
   }
   .app-header .search {
-    min-width: 0 !important; /* allow shrinking on small viewports */
+    min-width: 0 !important; /* Allow search input to shrink */
     width: 100% !important;
   }
   .app-header .icon-btn {
     justify-self: end;
   }
+  /* Switch to a single-column layout for cards */
   .cards {
     grid-template-columns: minmax(0, 1fr);
   }
