@@ -5,6 +5,7 @@
 
 const els = {
   search: document.getElementById("searchInput"),
+  categorySelect: document.getElementById("categorySelect"),
   filters: document.getElementById("filters"),
   cards: document.getElementById("cards"),
   stats: document.getElementById("stats"),
@@ -23,6 +24,7 @@ const state = {
   filtered: [],
   search: "",
   letter: "All",
+  category: "All",
   modalOpen: false,
   lastFocus: null,
   // Preview configuration
@@ -60,6 +62,7 @@ async function init() {
     const mdText = await fetchMarkdown("glossary.md");
     state.entries = parseGlossary(mdText);
     state.filtered = state.entries.slice();
+    buildCategoryDropdown();
     render();
     // Handle deep-links on load and respond to hash changes
     maybeOpenFromHash();
@@ -130,6 +133,46 @@ function bindSearch() {
   els.search?.addEventListener("input", onInput);
 }
 
+function buildCategoryDropdown() {
+  if (!els.categorySelect) return;
+  // Collect unique categories
+  const set = new Set();
+  for (const e of state.entries) {
+    for (const c of e.categories || []) {
+      if (c) set.add(c);
+    }
+  }
+  const cats = Array.from(set).sort((a, b) =>
+    a.localeCompare(b, undefined, { sensitivity: "base" })
+  );
+  // Preserve selection if possible
+  const prev = state.category || "All";
+  els.categorySelect.innerHTML = "";
+  const optAll = document.createElement("option");
+  optAll.value = "All";
+  optAll.textContent = "All categories";
+  els.categorySelect.appendChild(optAll);
+  for (const c of cats) {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    els.categorySelect.appendChild(opt);
+  }
+  els.categorySelect.disabled = cats.length === 0;
+  // Restore previous if present
+  if (cats.includes(prev)) {
+    els.categorySelect.value = prev;
+    state.category = prev;
+  } else {
+    els.categorySelect.value = "All";
+    state.category = "All";
+  }
+  els.categorySelect.addEventListener("change", (e) => {
+    state.category = e.target.value || "All";
+    applyFilters();
+  });
+}
+
 async function fetchMarkdown(filename) {
   // Encode spaces and special chars
   const url = encodeURI("./" + filename);
@@ -147,11 +190,30 @@ function parseGlossary(md) {
 
   const flush = () => {
     if (!currentTerm) return;
-    const definition = buffer.join("\n").trim();
+    // Extract categories from special lines like:
+    // "Category: AI, Data Science" or "Categories: AI; ML"
+    const cleanedLines = [];
+    const categories = [];
+    for (const rawLine of buffer) {
+      const m = rawLine.match(/^\s*(?:Categories?|Tags?)\s*:\s*(.+)$/i);
+      if (m) {
+        const parts = m[1]
+          .split(/[;,|]/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+        for (const c of parts) {
+          if (!categories.includes(c)) categories.push(c);
+        }
+      } else {
+        cleanedLines.push(rawLine);
+      }
+    }
+    const definition = cleanedLines.join("\n").trim();
     entries.push({
       term: currentTerm,
       definition,
       letter: (currentTerm[0] || "#").toUpperCase(),
+      categories,
     });
     currentTerm = null;
     buffer = [];
@@ -356,10 +418,19 @@ function closeModal() {
 function applyFilters() {
   const q = state.search.toLowerCase();
   const byLetter = state.letter;
+  const byCategory = state.category;
   state.filtered = state.entries.filter((e) => {
     const matchesLetter =
       byLetter === "All" ? true : e.term[0]?.toUpperCase() === byLetter;
     if (!matchesLetter) return false;
+    const hasCategory = (e.categories || []);
+    const matchesCategory =
+      byCategory === "All"
+        ? true
+        : hasCategory.some(
+            (c) => c.toLowerCase() === String(byCategory).toLowerCase()
+          );
+    if (!matchesCategory) return false;
     if (!q) return true;
     return (
       e.term.toLowerCase().includes(q) || e.definition.toLowerCase().includes(q)
@@ -375,6 +446,7 @@ function render() {
   const parts = [];
   parts.push(`${shown.toLocaleString()} of ${total.toLocaleString()} entries`);
   if (state.letter !== "All") parts.push(`Letter: ${state.letter}`);
+  if (state.category !== "All") parts.push(`Category: ${escapeHTML(state.category)}`);
   if (state.search) parts.push(`Query: "${escapeHTML(state.search)}"`);
   els.stats.textContent = parts.join(" · ");
 
