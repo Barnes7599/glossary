@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <!-- Header: Contains the title, search bar, category filter, and theme toggle -->
     <header class="app-header">
       <div class="brand">
         <span class="logo">📚</span>
@@ -26,6 +27,7 @@
       </div>
 
       <div class="controls">
+        <!-- Search input for filtering terms -->
         <div class="search">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24">
             <path
@@ -40,19 +42,21 @@
             autocomplete="off"
           />
         </div>
+        <!-- Dropdown to filter by category -->
         <div class="select">
           <label for="categorySelect" class="sr-only">Category</label>
           <select id="categorySelect" aria-label="Filter by category">
             <option>All categories</option>
           </select>
         </div>
+        <!-- Button to toggle between light and dark themes -->
         <button
           id="themeToggle"
           class="icon-btn"
           title="Switch theme"
           aria-label="Switch theme"
         >
-          <!-- Sun (shown in light) -->
+          <!-- Sun icon for light mode -->
           <svg
             class="theme-icon sun"
             aria-hidden="true"
@@ -65,7 +69,7 @@
               d="M6.76 4.84l-1.8-1.79l-1.41 1.41l1.79 1.8l1.42-1.42Zm10.48 14.32l1.79 1.8l1.41-1.41l-1.8-1.79l-1.4 1.4ZM12 5a1 1 0 0 0 1-1V2h-2v2a1 1 0 0 0 1 1Zm0 14a1 1 0 0 0-1 1v2h2v-2a1 1 0 0 0-1-1ZM5 11H3v2h2v-2Zm16 0h-2v2h2v-2Zm-2.05-6.21l-1.41-1.41l-1.8 1.79l1.41 1.41l1.8-1.79ZM6.76 19.16l-1.8 1.79l1.41 1.41l1.8-1.79l-1.41-1.41ZM12 7a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7Z"
             />
           </svg>
-          <!-- Moon (shown in dark) -->
+          <!-- Moon icon for dark mode -->
           <svg
             class="theme-icon moon"
             aria-hidden="true"
@@ -82,23 +86,29 @@
       </div>
     </header>
 
+    <!-- Navigation for alphabet filters -->
     <nav id="filters" class="filters" aria-label="Alphabet filters">
-      <!-- Buttons injected by JS -->
+      <!-- A-Z filter buttons are injected here by JavaScript -->
     </nav>
 
+    <!-- Main content area -->
     <main class="content">
+      <!-- Displays statistics about the glossary entries -->
       <section id="stats" class="stats" aria-live="polite"></section>
+      <!-- Container for glossary entry cards -->
       <section id="cards" class="cards" aria-label="Glossary entries">
-        <!-- Cards injected by JS -->
+        <!-- Glossary cards are injected here by JavaScript -->
       </section>
+      <!-- Displays status messages (e.g., "No results found") -->
       <section id="status" class="status" hidden></section>
     </main>
 
+    <!-- Footer (currently commented out) -->
     <!-- <footer class="app-footer">
     <span>Built from <code>glossary.md</code></span>
   </footer> -->
 
-    <!-- Modal (reusable) -->
+    <!-- Reusable modal for displaying full definitions -->
     <div id="modal" class="modal" hidden>
       <div class="modal-overlay" data-close="1"></div>
       <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalBody" tabindex="-1">
@@ -110,6 +120,7 @@
       </div>
     </div>
 
+    <!-- Main application script -->
     <script type="module" src="./app.js"></script>
   </body>
 </html>
