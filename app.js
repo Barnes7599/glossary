@@ -568,13 +568,6 @@ function render() {
     const h3 = document.createElement("h3");
     h3.textContent = e.term;
 
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    const badge = document.createElement("span");
-    badge.className = "badge";
-    badge.textContent = e.term[0]?.toUpperCase() || "#";
-    meta.appendChild(badge);
-
     const body = document.createElement("div");
     body.className = "body";
     const { preview, truncated } = getPreview(e.definition, state.previewLimit);
@@ -584,7 +577,6 @@ function render() {
     body.appendChild(p);
 
     card.appendChild(h3);
-    card.appendChild(meta);
     card.appendChild(body);
 
     // If definition is truncated, add an "Expand" button
